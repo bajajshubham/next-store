@@ -13,12 +13,12 @@ export async function signInWithCredentials(prevState: unknown, formData: FormDa
 
     await signIn('credentials', user)
 
-    return { success: true, message: 'Signed in' }
+    return { success: true, message: 'Successfully signed in!' }
   } catch (error) {
     if (isRedirectError(error)) {
       throw error
     }
-    return { success: false, message: 'Invalid email or password' }
+    return { success: false, message: 'Invalid email or password!' }
   }
 }
 
