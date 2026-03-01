@@ -19,7 +19,8 @@ export function formatNumberWithDecimal(num: number): string {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function formatError(error: any) {
   if (error.name === 'ZodError') {
-    const errorTree = z.treeifyError(error)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const errorTree = z.treeifyError(error) as any
     const fields = Object.keys(errorTree.properties)
     const fieldErrors = fields.map((fieldName) => errorTree.properties[fieldName].errors)
     return fieldErrors.join(". ")
