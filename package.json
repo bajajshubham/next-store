@@ -41,7 +41,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "pg": "^8.18.0",
-    "prisma": "^7.4.0",
+    "prisma": "^7.4.2",
     "shadcn": "^3.8.4",
     "tailwindcss": "^4.1.18",
     "tsx": "^4.21.0",
