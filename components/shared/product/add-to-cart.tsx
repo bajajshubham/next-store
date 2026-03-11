@@ -20,7 +20,7 @@ const AddToCart = ({ item }: { item: CartItem }) => {
       return
     }
 
-    toast.success(`${item.name} added to the cart`, {
+    toast.success(`${res.message}`, {
       className: "hover:!bg-secondary",
       action: {
         label: 'Go to cart',
