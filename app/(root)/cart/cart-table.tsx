@@ -9,6 +9,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { formatCurrency } from "@/lib/utils";
+import { Card, CardContent } from "@/components/ui/card";
 
 const CartTable = ({ cart }: { cart?: Cart }) => {
   const router = useRouter()
@@ -29,7 +31,7 @@ const CartTable = ({ cart }: { cart?: Cart }) => {
                 <TableRow>
                   <TableHead>Item</TableHead>
                   <TableHead className="text-center">Quantity</TableHead>
-                  <TableHead className="text-right">Price</TableHead>
+                  <TableHead className="text-right">Price per unit</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -73,6 +75,17 @@ const CartTable = ({ cart }: { cart?: Cart }) => {
               </TableBody>
             </Table>
           </div>
+          <Card className="p-0">
+            <CardContent className="p-4 gap-4">
+              <div className="pb-3 text-xl">
+                Subtotal ({cart.items.reduce((acc, c) => acc + c.qty, 0)})
+                <span className="font-bold">{formatCurrency(cart.itemsPrice)}</span>
+              </div>
+              <Button className="w-full" disabled={isPending} onClick={() => startTransition(() => router.push('/shipping-address'))}>
+                {isPending ? (<Loader className="w-4 h-4 animate-spin" />) : (<ArrowRight className="h-4 w-4" />)} Proceed to checkout
+              </Button>
+            </CardContent>
+          </Card>
         </div >
       )}
     </>
