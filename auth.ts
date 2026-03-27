@@ -118,7 +118,7 @@ export const config = {
       const { pathmane } = request.nextUrl
 
       // Check if user is not authenticated and accessing protected path
-      if (!request.auth && protectedPaths.some((p) => p.test(pathmane))) return false
+      if (!auth && protectedPaths.some(p => p.test(pathmane))) return false
 
       // Check for session cart cookie
       if (!request.cookies.get('sessionCartId')) {
