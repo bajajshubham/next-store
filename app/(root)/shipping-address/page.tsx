@@ -19,7 +19,6 @@ const ShippingAddressPage = async () => {
   const userId = session?.user?.id
   if (!userId) throw new Error("No user ID")
     
-
   const user = await getUserById(userId)
 
   return (
