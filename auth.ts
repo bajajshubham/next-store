@@ -115,10 +115,11 @@ export const config = {
       ]
 
       // Get pathmane from the request URL object
-      const { pathmane } = request.nextUrl
+      const { pathname } = request.nextUrl
+      console.log(pathname)
 
       // Check if user is not authenticated and accessing protected path
-      if (!auth && protectedPaths.some(p => p.test(pathmane))) return false
+      if (!auth && protectedPaths.some(p => p.test(pathname))) return false
 
       // Check for session cart cookie
       if (!request.cookies.get('sessionCartId')) {
