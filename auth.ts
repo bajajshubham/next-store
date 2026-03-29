@@ -62,7 +62,9 @@ export const config = {
     },
     async jwt({ token, user, trigger, session }: any) {
       if (user) {
+        token.id = user.id
         token.role = user.role
+
         if (user.name === 'NO_NAME') {
           token.name = token.email.split('@')[0]
           await prisma.user.update({
@@ -70,10 +72,56 @@ export const config = {
             data: { name: token.name }
           })
         }
+
+        if (trigger === 'signIn' || trigger === 'signUp') {
+          const cookiesObject = await cookies()
+          const sessionCartId = cookiesObject.get('sessionCartId')?.value
+
+          if (sessionCartId) {
+            const sessionCart = await prisma.cart.findFirst({
+              where: { sessionCartId }
+            })
+            if (sessionCart) {
+              if (sessionCart.userId && sessionCart.userId === user.id) {
+                // The cart is already assigned to the same user, no action needed
+              } else {
+                // Delete current user cart
+                await prisma.cart.deleteMany({
+                  where: { userId: user.id },
+                });
+
+                // Assign new cart
+                await prisma.cart.update({
+                  where: { id: sessionCart.id },
+                  data: { userId: user.id },
+                });
+              }
+            }
+          }
+        }
       }
       return token
     },
     authorized({ request, auth }: any) {
+      // Array of regex patterns of paths to protect
+      const protectedPaths = [
+        /\/shipping-address/,
+        /\/payment-method/,
+        /\/place-order/,
+        /\/profile/,
+        /\/user\/(.*)/,
+        /\/order\/(.*)/,
+        /\/admin/,
+      ]
+
+      // Get pathmane from the request URL object
+      const { pathname } = request.nextUrl
+      console.log(pathname)
+
+      // Check if user is not authenticated and accessing protected path
+      if (!auth && protectedPaths.some(p => p.test(pathname))) return false
+
+      // Check for session cart cookie
       if (!request.cookies.get('sessionCartId')) {
         const sessionCartId = crypto.randomUUID()
 
