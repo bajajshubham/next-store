@@ -23,3 +23,5 @@ async function generatePaypalAccessToken() {
     throw new Error(errorMessage)
   }
 }
+
+export {generatePaypalAccessToken}
