@@ -130,7 +130,7 @@ const OrderDetailsTable = ({ order, paypalClientId }: { order: Order, paypalClie
               {/* Paypal method */}
               {!isPaid && paymentMethod === 'PayPal' && (
                 <div>
-                  <PayPalScriptProvider options={{ clientId: paypalClientId }}>
+                  <PayPalScriptProvider options={{ clientId: paypalClientId, currency: "EUR" }}>
                     <PrintLoadingState />
                     <PayPalButtons createOrder={handleCreatePayPalOrder} onApprove={handleApprovePayPalOrder} />
                   </PayPalScriptProvider>
