@@ -44,7 +44,7 @@ export function round2(value: number | string) {
   } else throw new Error(' Value is not a number or string')
 }
 
-const CURRENCY_FORMATTER = new Intl.NumberFormat('en-DE', {
+const CURRENCY_FORMATTER = new Intl.NumberFormat('de-DE', {
   currency: 'EUR',
   style: 'currency',
   minimumFractionDigits: 2
