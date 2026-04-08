@@ -24,7 +24,28 @@ const ProfileForm = () => {
   });
 
   const onSubmit: SubmitHandler<z.infer<typeof updateProfileSchema>> = async (values: z.infer<typeof updateProfileSchema>) => {
-    console.log("HIIII")
+    const res = await updateProfile(values);
+
+    if (!res.success) {
+      toast.error(res.message, {
+        className: "!text-destructive",
+      })
+      return
+    }
+
+    const newSession = {
+      ...session,
+      user: {
+        ...session?.user,
+        name: values.name,
+      },
+    };
+    await update(newSession);
+
+    toast.success(`${res.message}`, {
+      className: "hover:!bg-secondary",
+    })
+
   }
 
 
