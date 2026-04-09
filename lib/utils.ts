@@ -125,3 +125,8 @@ export function buildUrlQuery({
     { skipNull: true }
   );
 }
+
+const NUMBER_FORMATTER = new Intl.NumberFormat('de-DE');
+export function formatNumber(number: number) {
+  return NUMBER_FORMATTER.format(number);
+}
