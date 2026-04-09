@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { getOrderById } from '@/lib/actions/order.actions'
 import type { ShippingAddress } from '@/types'
 import OrderDetailsTable from './order-details-table'
+import { auth } from '@/auth';
 
 export const metada: Metadata = {
   title: "Order Details"
@@ -14,8 +15,14 @@ const OrderDetailsPage = async (props: { params: Promise<{ id: string }> }) => {
   const order = await getOrderById(id)
   if (!order) notFound()
 
+  const session = await auth();
+
   return (
-    <OrderDetailsTable order={{ ...order, shippingAddress: order.shippingAddress as ShippingAddress }} paypalClientId={process.env.PAYPAL_CLIENT_ID || 'sb'} />
+    <OrderDetailsTable
+      order={{ ...order, shippingAddress: order.shippingAddress as ShippingAddress }}
+      paypalClientId={process.env.PAYPAL_CLIENT_ID || 'sb'}
+      isAdmin={session?.user.role === 'admin' || false}
+    />
   )
 }
 

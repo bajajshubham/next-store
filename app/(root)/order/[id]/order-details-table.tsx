@@ -7,10 +7,12 @@ import { Order } from '@/types'
 import Link from 'next/link'
 import Image from "next/image"
 import { PayPalButtons, PayPalScriptProvider, usePayPalScriptReducer } from "@paypal/react-paypal-js"
-import { createPaypalOrder, approvePaypalOrder } from '@/lib/actions/order.actions'
+import { createPaypalOrder, approvePaypalOrder, deliverOrder, updateOrderToPaidByCOD, } from '@/lib/actions/order.actions'
+import { useTransition } from 'react'
 import { toast } from 'sonner'
+import { Button } from '@/components/ui/button';
 
-const OrderDetailsTable = ({ order, paypalClientId }: { order: Order, paypalClientId: string }) => {
+const OrderDetailsTable = ({ order, paypalClientId, isAdmin }: { order: Order, paypalClientId: string, isAdmin: boolean }) => {
   const {
     shippingAddress,
     shippingPrice,
@@ -53,6 +55,59 @@ const OrderDetailsTable = ({ order, paypalClientId }: { order: Order, paypalClie
     }
   }
 
+  // Button To mark the order as paid
+  const MarkAsPaidButton = () => {
+    const [isPending, startTransition] = useTransition()
+    return (
+      <Button
+        type='button'
+        disabled={isPending}
+        onClick={() =>
+          startTransition(async () => {
+            const res = await updateOrderToPaidByCOD(order.id);
+            if (!res.success) {
+              toast.error(res.message, {
+                className: "!text-destructive"
+              })
+            } else {
+              toast.success(res.message, {
+                className: "hover:!bg-secondary",
+              });
+            }
+          })
+        }
+      >
+        {isPending ? 'processing...' : 'Mark As Paid'}
+      </Button>
+    );
+  };
+
+  // Button To mark the order as delivered
+  const MarkAsDeliveredButton = () => {
+    const [isPending, startTransition] = useTransition();
+    return (
+      <Button
+        type='button'
+        disabled={isPending}
+        onClick={() =>
+          startTransition(async () => {
+            const res = await deliverOrder(order.id);
+            if (!res.success) {
+              toast.error(res.message, {
+                className: "!text-destructive"
+              })
+            } else {
+              toast.success(res.message, {
+                className: "hover:!bg-secondary",
+              });
+            }
+          })
+        }
+      >
+        {isPending ? 'processing...' : 'Mark As Delivered'}
+      </Button>
+    );
+  };
   return (
     <>
       <h1 className="py-4 text-2xl">Order {formatId(id)}</h1>
@@ -136,6 +191,11 @@ const OrderDetailsTable = ({ order, paypalClientId }: { order: Order, paypalClie
                   </PayPalScriptProvider>
                 </div>
               )}
+              {
+                /* Cash On Delivery */
+              }
+              {isAdmin && !isPaid && paymentMethod === 'CashOnDelivery' && (<MarkAsPaidButton />)}
+              {isAdmin && isPaid && !isDelivered && (<MarkAsDeliveredButton />)}
             </CardContent>
           </Card>
         </div>
