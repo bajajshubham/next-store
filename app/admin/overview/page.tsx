@@ -7,12 +7,14 @@ import { BadgeEuro, Barcode, CreditCard, Users } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import Link from 'next/link';
 import Charts from './charts';
+import { requireAdmin } from '@/lib/auth-guard';
 
 export const metadata: Metadata = {
   title: 'Admin Dashboard',
 };
 
 const AdminDashboardPage = async () => {
+  await requireAdmin();
   const session = await auth()
   if (session?.user?.role !== 'admin') throw new Error("User is not authorized")
 
