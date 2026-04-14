@@ -8,6 +8,8 @@ import { prisma } from "@/db/prisma"
 import { formatError } from "../utils"
 import type { ShippingAddress } from "@/types"
 import z from "zod"
+import { PAGE_SIZE } from "../constants"
+import { revalidatePath } from "next/cache"
 
 export async function signInWithCredentials(prevState: unknown, formData: FormData) {
   try {
@@ -160,6 +162,44 @@ export async function updateProfile(user: { name: string; email: string }) {
     return {
       success: true,
       message: 'User updated successfully',
+    };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
+  }
+}
+
+// Get all users
+export async function getAllUsers({
+  limit = PAGE_SIZE,
+  page,
+}: {
+  limit?: number;
+  page: number;
+}) {
+  const data = await prisma.user.findMany({
+    orderBy: { createdAt: 'desc' },
+    take: limit,
+    skip: (page - 1) * limit,
+  });
+
+  const dataCount = await prisma.user.count();
+
+  return {
+    data,
+    totalPages: Math.ceil(dataCount / limit),
+  };
+}
+
+// Delete user by ID
+export async function deleteUser(id: string) {
+  try {
+    await prisma.user.delete({ where: { id } });
+
+    revalidatePath('/admin/users');
+
+    return {
+      success: true,
+      message: 'User deleted successfully',
     };
   } catch (error) {
     return { success: false, message: formatError(error) };

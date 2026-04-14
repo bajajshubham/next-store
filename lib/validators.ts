@@ -105,3 +105,9 @@ export const updateProfileSchema = z.object({
 export const updateProductSchema = insertProductSchema.extend({
   id: z.string().min(1, 'Id is required'),
 });
+
+// Update User Schema
+export const updateUserSchema = updateProfileSchema.extend({
+  id: z.string().min(1, 'Id is required'),
+  role: z.string().min(1, 'Role is required'),
+});
