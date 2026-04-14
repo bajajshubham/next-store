@@ -18,6 +18,7 @@ import { createProduct, updateProduct } from "@/lib/actions/product.actions";
 import { UploadButton } from "@/lib/uploadthing";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image"
+import { Checkbox } from "@/components/ui/checkbox";
 
 const ProductForm = ({ type, product, productId }: { type: 'Create' | 'Update', product?: Product, productId?: string }) => {
   const router = useRouter()
@@ -67,6 +68,9 @@ const ProductForm = ({ type, product, productId }: { type: 'Create' | 'Update', 
   };
 
   const images = form.watch('images');
+
+  const isFeatured = form.watch('isFeatured');
+  const banner = form.watch('banner');
 
   return (
     <Form {...form}>
@@ -229,7 +233,7 @@ const ProductForm = ({ type, product, productId }: { type: 'Create' | 'Update', 
                       ))}
                       <FormControl>
                         <UploadButton
-                        className=""
+                          className=""
                           endpoint='imageUploader'
                           onClientUploadComplete={(res: { url: string }[]) => {
                             form.setValue('images', [...images, res[0].url]);
@@ -244,12 +248,53 @@ const ProductForm = ({ type, product, productId }: { type: 'Create' | 'Update', 
                     </div>
                   </CardContent>
                 </Card>
-                
+
               </Field>
             )}
           />
         </div>
-        <div className='upload-field'>{/* Is Featured */}</div>
+        <div className='upload-field'>
+          {/* Is Featured */}
+          Feature Product
+          <Card>
+            <CardContent className='space-y-2'>
+              
+                <Controller
+                  name="isFeatured"
+                  control={form.control}
+                  render={({ field }: { field: ControllerRenderProps<z.infer<typeof insertProductSchema>, 'isFeatured'> }) => (
+                    <Field orientation="horizontal">
+                      <Checkbox id="isFeatured" name={field.name} checked={field.value} onCheckedChange={field.onChange} />
+                      <FieldLabel htmlFor="isFeatured">Is Featured?</FieldLabel>
+                    </Field>
+                  )}
+                />
+                {isFeatured && banner && (
+                  <Image
+                    src={banner}
+                    alt='banner image'
+                    className=' w-full object-cover object-center rounded-sm'
+                    width={1920}
+                    height={680}
+                  />
+                )}
+                {isFeatured && !banner && (
+                  <UploadButton
+                    endpoint='imageUploader'
+                    onClientUploadComplete={(res: { url: string }[]) => {
+                      form.setValue('banner', res[0].url);
+                    }}
+                    onUploadError={(error: Error) => {
+                      toast.error(`ERROR! ${error.message}`, {
+                        className: '!text-destructive'
+                      });
+                    }}
+                  />
+                )}
+              
+            </CardContent>
+          </Card>
+        </div>
         <div>
           <Controller
             name="description"
