@@ -19,6 +19,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import { updateUser } from '@/lib/actions/user.actions'
 
 const updateUserForm = ({
   user,
@@ -32,9 +33,37 @@ const updateUserForm = ({
     defaultValues: user,
   });
 
+  const onSubmit = async (values: z.infer<typeof updateUserSchema>) => {
+    try {
+      const res = await updateUser({
+        ...values,
+        id: user.id,
+      });
+
+      if (!res.success) {
+        toast.error(res.message, {
+          className: '!text-destructive'
+        })
+        return
+      }
+
+      toast.success(res.message, {
+        className: 'hover:!bg-secondary'
+      });
+
+      form.reset()
+      router.push(`/admin/users`)
+
+    } catch (error) {
+      toast.error((error as Error).message, {
+        className: '!text-destructive'
+      });
+    }
+  };
+
   return (
     <Form {...form}>
-      <form className='space-y-4'>
+      <form className='space-y-4' method='post' onSubmit={form.handleSubmit(onSubmit)}>
         <div>
           <Controller
             name="email"
