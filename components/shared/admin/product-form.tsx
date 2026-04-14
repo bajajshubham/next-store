@@ -9,11 +9,12 @@ import { insertProductSchema, updateProductSchema } from "@/lib/validators";
 import { Product } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { Controller, ControllerFieldState, ControllerRenderProps, Resolver, useForm } from "react-hook-form";
+import { Controller, ControllerFieldState, ControllerRenderProps, Resolver, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
 import slugify from 'slugify'
 import { Textarea } from "@/components/ui/textarea";
+import { createProduct, updateProduct } from "@/lib/actions/product.actions";
 
 const ProductForm = ({ type, product, productId }: { type: 'Create' | 'Update', product?: Product, productId?: string }) => {
   const router = useRouter()
@@ -23,9 +24,48 @@ const ProductForm = ({ type, product, productId }: { type: 'Create' | 'Update', 
     defaultValues: product && type === 'Update' ? product : productDefaultValues,
   });
 
+  // Handle form submit
+  const onSubmit: SubmitHandler<z.infer<typeof insertProductSchema>> = async (
+    values
+  ) => {
+    if (type === 'Create') {
+      const res = await createProduct(values);
+
+      if (!res.success) {
+        toast.error(res.message, {
+          className: "text-destructive"
+        })
+      } else {
+        toast.success(res.message, {
+          className: "hover:!bg-secondary",
+        });
+        router.push(`/admin/products`);
+      }
+    }
+    if (type === 'Update') {
+      if (!productId) {
+        router.push(`/admin/products`);
+        return;
+      }
+
+      const res = await updateProduct({ ...values, id: productId });
+
+      if (!res.success) {
+        toast.error(res.message, {
+          className: "text-destructive"
+        })
+      } else {
+        toast.success(res.message, {
+          className: "hover:!bg-secondary",
+        });
+        router.push(`/admin/products`);
+      }
+    }
+  };
+
   return (
     <Form {...form}>
-      <form className='space-y-8'>
+      <form className='space-y-8' method='post' onSubmit={form.handleSubmit(onSubmit)}>
         <div className='flex flex-col gap-5 md:flex-row'>
           {/* Name */}
           <Controller
@@ -178,7 +218,7 @@ const ProductForm = ({ type, product, productId }: { type: 'Create' | 'Update', 
                   aria-invalid={fieldState.invalid}
                   placeholder="Enter the product description"
                   autoComplete="off"
-                  className="resize-none"
+                  className="resize-none h-40"
                 />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
