@@ -1,4 +1,3 @@
-import { auth } from '@/auth';
 import Pagination from '@/components/shared/pagination';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,6 +21,8 @@ export const metadata: Metadata = {
 };
 
 const AdminUserPage = async (props: { searchParams: Promise<{ page: string; query: string }> }) => {
+  await requireAdmin();
+
   const searchParams = await props.searchParams;
   const { page = '1', query: searchText } = searchParams;
 
