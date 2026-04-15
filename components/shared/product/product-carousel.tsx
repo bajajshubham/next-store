@@ -21,7 +21,7 @@ function ProductCarousel({ data }: { data: Product[] }) {
       }}
       plugins={[
         Autoplay({
-          delay: 2000,
+          delay: 8000,
           stopOnInteraction: true,
           stopOnMouseEnter: true,
         }),
