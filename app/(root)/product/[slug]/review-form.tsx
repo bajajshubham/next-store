@@ -36,7 +36,7 @@ import { StarIcon } from 'lucide-react';
 import { toast } from 'sonner'
 import { createUpdateReview, getReviewByProductId } from '@/lib/actions/review.actions';
 
-type CustomerReview = z.infer<typeof insertReviewSchema>;
+type CustomerReview = z.input<typeof insertReviewSchema>;
 
 const ReviewForm = ({
   userId,
@@ -50,7 +50,7 @@ const ReviewForm = ({
 
   const [open, setOpen] = useState(false);
 
-  const form = useForm<z.infer<typeof insertReviewSchema>>({
+  const form = useForm<z.input<typeof insertReviewSchema>>({
     resolver: zodResolver(insertReviewSchema),
     defaultValues: reviewFormDefaultValues,
   });
@@ -71,7 +71,7 @@ const ReviewForm = ({
   }
 
   const onSubmit: SubmitHandler<CustomerReview> = async (values) => {
-    const res = await createUpdateReview({ ...values, productId });
+    const res = await createUpdateReview({ ...values, rating: Number(values.rating), productId });
     if (!res.success) {
       return toast.error(res.message, {
         className: "!text-destructive"
@@ -134,7 +134,7 @@ const ReviewForm = ({
                   <FormLabel>Rating</FormLabel>
                   <Select
                     onValueChange={field.onChange}
-                    value={field.value.toString()}
+                    value={!field.value ? undefined : field.value.toString()}
                   >
                     <FormControl>
                       <SelectTrigger className='w-full'>

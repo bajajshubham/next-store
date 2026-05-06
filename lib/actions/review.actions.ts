@@ -18,6 +18,7 @@ export async function createUpdateReview(
     // Validate and store review data and userId
     const review = insertReviewSchema.parse({
       ...data,
+      rating: Number(data.rating),
       userId: session?.user.id,
     });
 

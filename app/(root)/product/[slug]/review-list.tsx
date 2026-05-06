@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Review } from '@/types';
+import type { Review } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar, Check, User } from 'lucide-react';
 import { formatDateTime } from '@/lib/utils';
