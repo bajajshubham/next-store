@@ -2,10 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { updateOrderToPaid } from '@/lib/actions/order.actions';
 
-// Initializing Stripe with the secret API key from environment variables
+// Initialize Stripe with the secret API key from environment variables
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
-// Define the POST handler function for the Stripe webhook
 export async function POST(req: NextRequest) {
   const event = await stripe.webhooks.constructEvent(
     await req.text(),
@@ -14,7 +13,7 @@ export async function POST(req: NextRequest) {
   )
 
   if (event.type === 'charge.succeeded') {
-    const { object } = event.data
+    const { object } = event.data;
 
     // Update the order status to paid
     await updateOrderToPaid({
@@ -32,5 +31,5 @@ export async function POST(req: NextRequest) {
   }
   return NextResponse.json({
     message: 'event is not charge.succeeded',
-  })
+  });
 }
